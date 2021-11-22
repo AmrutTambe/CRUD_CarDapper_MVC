@@ -1,0 +1,187 @@
+﻿@model IPagedList<CRUD_CarDapper_MVC.Models.Car>
+@using PagedList;
+@using PagedList.Mvc;
+<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Car</h2>
+
+
+
+<div class="row pb-3">
+    <div class="col-md-6">
+        <form method="get" action="@Url.Action("Index")">
+            <input name="Search" type="search" placeholder="Search" value="@ViewBag.Request.Search" />
+            <button class="btn btn-primary">Search</button>
+        </form>
+    </div>
+
+    <div class="col-md-6 text-end">
+        @*<form method="get" action="@Url.Action("Index")">
+                <button class="btn btn-primary">Refresh</button>
+            </form>*@
+        @Html.ActionLink("Create New", "Create", null,
+        new { @class = "btn btn-primary" })
+        @Html.ActionLink("Refresh", "Index", null,
+       new { @class = "btn btn-primary" })
+
+        <button class="btn btn-primary" type="submit" value="print" onclick="window.print()">Print</button>
+        @*<button class="btn btn-primary">Export to Excel</button>*@
+        <a href="@Url.Action("ExportToExcel", "Car")"><button class="btn btn-primary">Export to Excel</button></a>
+        <button class="btn btn-primary" id="btnFullScreen" onclick="#btnFullScreen">FullScreen</button>
+    </div>
+    <script>
+        function PrintOnlyTable() {
+            var HTML = $("html");
+            var cln = document.documentElement.innerHTML;
+            HTML.html($("table"));
+            window.print();
+            document.documentElement.innerHTML = cln;
+            return false;
+        }
+    </script>
+
+    <table class="table">
+        <tr>
+            <th>
+                @Html.ActionLink("CarName", "Index"
+                     , new CRUD_CarDapper_MVC.Models.RequestModel
+                     {
+                         //PageNumber=ViewBag.Request.PageNumber,
+                         //PageSize = ViewBag.Request.PageSize,
+                         Search = ViewBag.Request.Search,
+                         OrderBy = "carname",
+                         IsDescending = (ViewBag.Request.OrderBy == "carname"
+                                         &&
+                                         ViewBag.Request.IsDescending == false) ? true : false
+                     }, null)
+            </th>
+            <th>
+                @Html.ActionLink("CarModel", "Index"
+                     , new CRUD_CarDapper_MVC.Models.RequestModel
+                     {
+                         //PageNumber = ViewBag.Request.PageNumber,
+                         //PageSize = ViewBag.Request.PageSize,
+                         Search = ViewBag.Request.Search,
+                         OrderBy = "carmodel",
+                         IsDescending = (ViewBag.Request.OrderBy == "carmodel"
+                                         &&
+                                         ViewBag.Request.IsDescending == false) ? true : false
+                     }, null)
+            </th>
+            <th>
+                @Html.ActionLink("Company", "Index"
+                    , new CRUD_CarDapper_MVC.Models.RequestModel
+                    {
+                        //PageNumber = ViewBag.Request.PageNumber,
+                        //PageSize = ViewBag.Request.PageSize,
+                        Search = ViewBag.Request.Search,
+                        OrderBy = "company",
+                        IsDescending = (ViewBag.Request.OrderBy == "company"
+                                        &&
+                                        ViewBag.Request.IsDescending == false) ? true : false
+                    }, null)
+            </th>
+            <th>
+                @Html.ActionLink("Price", "Index"
+                    , new CRUD_CarDapper_MVC.Models.RequestModel
+                    {
+                        //PageNumber = ViewBag.Request.PageNumber,
+                        //PageSize = ViewBag.Request.PageSize,
+                        Search = ViewBag.Request.Search,
+                        OrderBy = "price",
+                        IsDescending = (ViewBag.Request.OrderBy == "price"
+                                        &&
+                                        ViewBag.Request.IsDescending == false) ? true : false
+                    }, null)
+            </th>
+            <th></th>
+        </tr>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CarName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CarModel)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Company)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Price)
+                </td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
+                    @Html.ActionLink("Details", "Details", new { id = item.Id }) |
+                    @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                </td>
+            </tr>
+
+        }
+
+    </table>
+    @*Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount*@
+    @Html.PagedListPager(Model, i => Url.Action("Index", "Car", new { i, search = Request.QueryString["search"] }),
+        new PagedListRenderOptions() { Display = PagedListDisplayMode.IfNeeded, DisplayPageCountAndCurrentLocation = true, DisplayItemSliceAndTotal = true })
+    @*<div class="row">
+            <div class="col-md-9">
+                <a href="">&laquo; First</a>
+                <a href="">&lt; Previous</a>
+                Showing 1 out of 5 pages
+                <a href="">&gt; Next</a>
+                <a href="">&raquo; Last</a>
+
+                [Total 5000 records]
+            </div>
+            <div class="col text-end">
+                Page Size: 20 30 50 All
+            </div>
+        </div>*@
+    @*<div id="container" style="margin-left: 20px">
+            <p></p>
+            <p></p>
+            <div class="pagination" style="margin-left: 400px">
+                Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+                @Html.PageListPager(Model, page => Url.Action("Index", new { page = page, sortOrder = ViewBag.CurrentSortOrder, SelectedText = ViewBag.ValueToSet }))
+            </div>
+        </div>
+        </div>*@
+    <script type="text/javascript">
+
+        //Btn Full Screen
+        $("#btnFullScreen").click(function () {
+
+            var el = document.documentElement,
+                rfs = el.requestFullscreen
+                    || el.webkitRequestFullScreen
+                    || el.mozRequestFullScreen
+                    || el.msRequestFullscreen
+                ;
+
+            rfs.call(el);
+        });
+
+            ////Btn Close Screen
+            //$("#btnCloseScreen").click(function () {
+
+            //    alert("Close Screen");
+            //    if (document.exitFullscreen) {
+            //        document.exitFullscreen();
+            //    } else if (document.mozCancelFullScreen) {
+            //        document.mozCancelFullScreen();
+            //    } else if (document.webkitExitFullscreen) {
+            //        document.webkitExitFullscreen();
+            //    } else if (document.msExitFullscreen) {
+            //        document.msExitFullscreen();
+            //    }
+
+            //});
+    </script>
